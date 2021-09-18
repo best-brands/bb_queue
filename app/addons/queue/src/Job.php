@@ -5,7 +5,7 @@ namespace Tygh\Addons\Queue;
 use Tygh\Addons\Queue\Connectors\ConnectorInterface;
 
 /**
- *
+ * A base job implementation.
  */
 abstract class Job implements JobInterface
 {
