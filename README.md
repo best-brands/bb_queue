@@ -29,8 +29,10 @@ If you do not, you **should change the contents to include init.php accordingly*
 
 ## How do I configure cron?
 
+Mind that php7.4 is required. Path to the binary differs per linux distro.
+
 ```crontab
-* * * * * /usr/bin/php7.4 -f /data/www/activestyle/cli.php -- --dispatch=queue.schedule_cron_jobs
+* * * * * /usr/bin/php7.4 -f %%STORE_PATH%%/cli.php -- --dispatch=queue.schedule_cron_jobs
 ```
 
 ## How do I configure workers?
