@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<addon scheme="4.0">
+    <id>queue_example</id>
+    <name>Queue example add-on</name>
+    <description>A simple example of how to use the jobbing add-on</description>
+    <version>1.0</version>
+    <priority>10</priority>
+    <position>0</position>
+    <status>active</status>
+    <supplier>Best Brands</supplier>
+    <supplier_link>https://github.com/best-brands</supplier_link>
+    <default_language>en</default_language>
+
+    <authors>
+        <author>
+            <name>Harm Smits</name>
+            <email>harm@bestbrands.eu</email>
+            <phone>+31625500655</phone>
+        </author>
+    </authors>
+
+    <compatibility>
+        <dependencies>queue</dependencies>
+
+        <core_version>
+            <min>4.11.5</min>
+        </core_version>
+
+        <php_version>
+            <min>7.4.0</min>
+        </php_version>
+    </compatibility>
+
+    <autoload>
+        <psr4 prefix="Tygh\Addons\QueueExample\">src</psr4>
+    </autoload>
+
+    <bootstrap>\Tygh\Addons\QueueExample\Bootstrap</bootstrap>
+</addon>
