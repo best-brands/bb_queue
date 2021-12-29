@@ -18,7 +18,7 @@ class ServiceProvider implements ServiceProviderInterface
     public function register(Container $pimple)
     {
         // We define the job dependency
-        $pimple['addons.queue_example.jobs.example'] = static function ($pimple) {
+        $pimple[Jobs\ExampleJob::class] = static function ($pimple) {
             return new Jobs\ExampleJob(
                 $pimple['addons.queue.connector']
             );
@@ -27,7 +27,7 @@ class ServiceProvider implements ServiceProviderInterface
         // We add the job the to the job_pool dependency
         $pimple->extend('addons.queue.job_pool', static function (JobPool $pool) use ($pimple) {
             $pool->addJobs([
-                $pimple['addons.queue_example.jobs.example'],
+                $pimple[Jobs\ExampleJob::class],
             ]);
 
             return $pool;

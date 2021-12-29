@@ -77,3 +77,7 @@ Make sure to replace the `fn_set_hook('save_log', ...);` with the following:
 ```
 
 Finally, make sure to adjust `Bootstrap.php` to register the hook handler accordingly.
+
+## Dispatching jobs programatically
+
+You can dispatch jobs using `fn_queue_dispatch` and `fn_queue_dispatch_sync`;

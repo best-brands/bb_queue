@@ -9,9 +9,6 @@ use Tygh\Addons\Queue\Job;
  */
 class ExampleJob extends Job
 {
-    /** @inheritDoc */
-    protected string $name = 'example_job';
-
     /** @var string|null By setting the cron expression, it will get scheduled correctly */
     protected ?string $cron_expression = '* * * * *';
 
