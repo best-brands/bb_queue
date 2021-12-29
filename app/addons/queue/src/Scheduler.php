@@ -23,9 +23,20 @@ class Scheduler
     }
 
     /**
+     * Schedule a job.
+     *
+     * @param string $fqcn
+     * @param $message
+     */
+    public function schedule(string $fqcn, $message)
+    {
+        $this->pool->getJob($fqcn)->schedule($message);
+    }
+
+    /**
      * Schedule jobs to be run (cron).
      */
-    public function schedule(): void
+    public function scheduleCronJobs(): void
     {
         $this->pool->apply(function (JobInterface $job) {
             if (!$job->hasCronExpression()) {

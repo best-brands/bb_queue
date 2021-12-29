@@ -9,13 +9,12 @@ if (php_sapi_name() === 'cli') {
         $queue_worker->launch();
     } elseif ($mode === 'schedule_cron_jobs') {
         $scheduler = Tygh::$app['addons.queue.scheduler'];
-        $scheduler->schedule();
+        $scheduler->scheduleCronJobs();
     }
 
     exit(0);
+}
 
-} elseif ($mode === 'insert_test') {
-    Tygh::$app['addons.queue.jobs.test']->schedule("Hello again!\n");
-
-    return [CONTROLLER_STATUS_DENIED];
+if ($mode === 'manage') {
+    Tygh::$app['view']->assign('queue_messages', db_get_array('SELECT * FROM cscart_queue_messages'));
 }

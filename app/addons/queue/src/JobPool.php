@@ -5,6 +5,7 @@ namespace Tygh\Addons\Queue;
 use Closure;
 use Exception;
 use InvalidArgumentException;
+use Tygh\Addons\Queue\Exceptions\JobException;
 
 /**
  * Class ConnectorPool

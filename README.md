@@ -60,3 +60,20 @@ stopwaitsecs=3600
 ```
 
 Replace %%STORE_PATH%% with your root folder.
+
+## Suppressing the default CsCart logger
+
+You can suppress the default CsCart logger by altering `functions/fn.log.php`;
+Make sure to replace the `fn_set_hook('save_log', ...);` with the following:
+
+```php
+    $suppress = false;
+
+    fn_set_hook('save_log', $type, $action, $data, $user_id, $content, $event_type, $object_primary_keys, $suppress);
+
+    if ($suppress) {
+        return true;
+    }
+```
+
+Finally, make sure to adjust `Bootstrap.php` to register the hook handler accordingly.

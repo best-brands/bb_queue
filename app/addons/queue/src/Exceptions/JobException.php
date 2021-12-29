@@ -1,6 +1,6 @@
 <?php
 
-namespace Tygh\Addons\Queue;
+namespace Tygh\Addons\Queue\Exceptions;
 
 use Exception;
 

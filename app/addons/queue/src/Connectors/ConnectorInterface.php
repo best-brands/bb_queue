@@ -19,6 +19,26 @@ interface ConnectorInterface
     public function send(string $queue, string $message): bool;
 
     /**
+     * Return the amount of items in a queue.
+     *
+     * @param string $queue
+     *
+     * @return int
+     */
+    public function countInQueue(string $queue): int;
+
+    /**
+     * Reschedule a job.
+     *
+     * @param int  $id
+     * @param int  $time
+     * @param bool $relative
+     *
+     * @return mixed
+     */
+    public function reschedule(int $id, int $time, bool $relative = true);
+
+    /**
      * Receive a message from the queue
      *
      * @return mixed

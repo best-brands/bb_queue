@@ -2,16 +2,15 @@
 
 namespace Tygh\Addons\Queue;
 
+use DateTime;
 use Tygh\Addons\Queue\Connectors\ConnectorInterface;
+use Tygh\Addons\Queue\Exceptions\JobException;
 
 /**
- * A base job implementation.
+ *
  */
 abstract class Job implements JobInterface
 {
-    /** @var string The queue name is by */
-    protected string $name;
-
     /** @var int The default delay of a message. */
     protected int $delay = 0;
 
@@ -22,6 +21,24 @@ abstract class Job implements JobInterface
     protected int $retention = SECONDS_IN_DAY;
 
     protected ?string $cron_expression = null;
+
+    /** @var bool Determine whether a job should be unique */
+    protected bool $is_unique = false;
+
+    /** @var mixed */
+    protected $id;
+
+    /** @var mixed */
+    protected $queue_id;
+
+    /** @var mixed */
+    protected $consumer;
+
+    /** @var mixed */
+    protected $inserted_on;
+
+    /** @var mixed */
+    protected $read_on;
 
     /** @var ConnectorInterface The database connector */
     protected ConnectorInterface $connector;
@@ -55,7 +72,65 @@ abstract class Job implements JobInterface
      */
     public function schedule($message = null): bool
     {
-        return $this->connector->send($this->getName(), $message);
+        $result = false;
+
+        if (
+            $this->is_unique && $this->connector->countInQueue(get_class($this)) < 1
+            || !$this->is_unique
+        ) {
+            $result = $this->connector->send(get_class($this), $message);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param $data
+     */
+    public function setContext(array $data): void
+    {
+        $keys = [
+            'id' => 'id',
+            'queue_id' => 'queue_id',
+            'consumer' => 'consumer',
+            'inserted_on' => 'inserted_on',
+            'read_on' => 'read_on',
+        ];
+
+        foreach ($data as $k => $v) {
+            if (!array_key_exists($k, $keys)) {
+                continue;
+            }
+
+            $this->{$keys[$k]} = $v;
+        }
+    }
+
+    /**
+     * @param string $message
+     */
+    public function write(string $message): void
+    {
+        echo sprintf(
+            "[%s][%s] %s %s\n",
+            (new DateTime())->format('Y-m-d H:i:s'),
+            $this->id,
+            $this->queue_id,
+            $message
+        );
+    }
+
+    /**
+     * Reschedule job.
+     *
+     * @param array $job_data
+     * @param int   $amount
+     *
+     * @return mixed
+     */
+    public function reschedule(array $job_data, int $amount)
+    {
+        return $this->connector->reschedule($job_data['id'], $amount);
     }
 
     /**
@@ -65,7 +140,7 @@ abstract class Job implements JobInterface
      */
     public function getName(): string
     {
-        return $this->name;
+        return get_class($this);
     }
 
     /**
@@ -98,6 +173,9 @@ abstract class Job implements JobInterface
         return $this->retention;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getCronExpression(): string
     {
         if ($this->cron_expression === null) {

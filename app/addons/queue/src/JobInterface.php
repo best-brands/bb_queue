@@ -34,6 +34,20 @@ interface JobInterface
     public function getName(): string;
 
     /**
+     * Write formatted to the standard output.
+     *
+     * @param string $message
+     */
+    public function write(string $message): void;
+
+    /**
+     * Set the job execution context.
+     *
+     * @param array $data
+     */
+    public function setContext(array $data): void;
+
+    /**
      * Get the cron expression string.
      *
      * @return string

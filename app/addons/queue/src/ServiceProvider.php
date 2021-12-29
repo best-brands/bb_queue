@@ -5,9 +5,11 @@ namespace Tygh\Addons\Queue;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Tygh\Addons\Queue\Connectors\DatabaseConnector;
+use Tygh\Addons\Queue\Jobs\SeedGoogleSitemapRegenerationJob;
 use Tygh\Addons\Queue\Jobs\Test;
 use Tygh\Addons\Queue\Serializer\JsonSerializer;
 use Tygh\Addons\Queue\Serializer\SerializerInterface;
+use Tygh\Providers\StorefrontProvider;
 use Tygh\Registry;
 
 /**
@@ -32,15 +34,27 @@ class ServiceProvider implements ServiceProviderInterface
             return new CronExpressionParser\Expression();
         };
 
-        $pimple['addons.queue.jobs.test'] = static function ($pimple) {
-            return new Test(
+        $pimple['addons.queue.hook_handlers.log'] = static function() {
+            return new HookHandlers\LogHookHandler();
+        };
+
+        $pimple[Jobs\ExportGoogleSitemapFeedsJob::class] = static function ($pimple) {
+            return new Jobs\ExportGoogleSitemapFeedsJob(
                 $pimple['addons.queue.connector']
+            );
+        };
+
+        $pimple[Jobs\SeedGoogleSitemapRegenerationJob::class] = static function ($pimple) {
+            return new Jobs\SeedGoogleSitemapRegenerationJob(
+                $pimple['addons.queue.connector'],
+                StorefrontProvider::getRepository(),
             );
         };
 
         $pimple['addons.queue.job_pool'] = static function ($pimple) {
             return new JobPool([
-                $pimple['addons.queue.jobs.test'],
+                $pimple[Jobs\ExportGoogleSitemapFeedsJob::class],
+                $pimple[Jobs\SeedGoogleSitemapRegenerationJob::class],
             ]);
         };
 

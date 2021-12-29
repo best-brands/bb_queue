@@ -44,18 +44,33 @@ class DatabaseConnector implements ConnectorInterface
     }
 
     /**
+     * Return the amount of items in a queue.
+     *
+     * @param string $queue
+     *
+     * @return int
+     */
+    public function countInQueue(string $queue): int
+    {
+        return (int)db_get_field('SELECT COUNT(*) FROM ?:queue_messages WHERE queue_id = ?s', $queue);
+    }
+
+    /**
      * @inheritDoc
      */
     public function receive(): array
     {
         $consumer = mt_rand() . '-' . time();
 
+        // multiquery for lock.
+
         $result = db_query(
-            'UPDATE ?:queue_messages SET consumer = ?s, read_on = UNIX_TIMESTAMP(NOW())'
-            . ' WHERE (read_on IS NULL OR (UNIX_TIMESTAMP(NOW()) > read_on)) AND UNIX_TIMESTAMP(NOW()) >= inserted_on'
+            'UPDATE ?:queue_messages SET consumer = ?s, timeout = ?i, read_on = UNIX_TIMESTAMP(NOW())'
+            . ' WHERE (read_on IS NULL OR (UNIX_TIMESTAMP(NOW()) > read_on + timeout)) AND UNIX_TIMESTAMP(NOW()) >= inserted_on'
             . ' ORDER BY inserted_on, id ASC'
             . ' LIMIT 1',
-            $consumer
+            $consumer,
+            60
         );
 
         if (!$result) {
@@ -78,6 +93,22 @@ class DatabaseConnector implements ConnectorInterface
             'DELETE FROM ?:queue_messages WHERE id = ?i OR (inserted_on < (UNIX_TIMESTAMP(NOW()) - ?i) AND read_times > 2)',
             $receipt,
             SECONDS_IN_DAY * 7,
+        );
+    }
+
+    /**
+     * @param      $receipt
+     * @param int  $time
+     * @param bool $relative
+     *
+     * @return mixed
+     */
+    public function reschedule(int $id, int $time, bool $relative = true)
+    {
+        return db_query(
+            'UPDATE ?:queue_messages SET read_times = 0, inserted_on = ?i, consumer = null WHERE id = ?s',
+            $time + ($relative ? time() : 0),
+            $id,
         );
     }
 }

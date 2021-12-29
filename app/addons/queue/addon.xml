@@ -55,5 +55,20 @@
         <item for="uninstall">
             DROP TABLE IF EXISTS ?:queue_messages
         </item>
+
+        <item for="install">
+            CREATE TABLE IF NOT EXISTS ?:queue_messages_undelivered (
+                id INT(11) NOT NULL,
+                queue_id varchar(64) NOT NULL,
+                body LONGBLOB NOT NULL,
+                output LONGBLOB NOT NULL,
+                timeout INT(11) DEFAULT NULL,
+                created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP),
+                PRIMARY KEY(id)
+            ) ENGINE=InnoDB;
+        </item>
+        <item for="uninstall">
+            DROP TABLE IF EXISTS ?:queue_messages_undelivered
+        </item>
     </queries>
 </addon>
