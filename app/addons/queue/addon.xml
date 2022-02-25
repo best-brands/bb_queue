@@ -21,7 +21,7 @@
 
     <compatibility>
         <core_version>
-            <min>4.11.5</min>
+            <min>4.15.1</min>
         </core_version>
         <php_version>
             <min>7.4.0</min>
@@ -36,39 +36,35 @@
 
     <queries>
         <item for="install">
-            CREATE TABLE IF NOT EXISTS ?:queue_messages (
-                id INT(11) NOT NULL AUTO_INCREMENT,
-                queue_id varchar(64) NOT NULL,
-                body LONGBLOB NOT NULL,
-                consumer VARCHAR(255) DEFAULT NULL,
-                timeout INT(11) DEFAULT NULL,
-                read_on INT(11) DEFAULT NULL,
-                inserted_on INT(11) NOT NULL,
-                read_times INT(11) NOT NULL DEFAULT 0,
-                PRIMARY KEY(id),
-                KEY `queue_idx` (`queue_id`) USING BTREE
+            CREATE TABLE IF NOT EXISTS ?:jobs (
+                id BIGINT NOT NULL,
+                queue VARCHAR(255) NOT NULL,
+                payload LONGBLOB NOT NULL,
+                attempts UNSIGNED INT NOT NULL DEFAULT 0,
+                reserved_at TIMESTAMP,
+                available_at TIMESTAMP NOT NULL,
+                created_at TIMESTAMP NOT NULL,
+                PRIMARY KEY (id),
+                KEY (queue)
             ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         </item>
-        <item for="install">
-            ALTER TABLE ?:queue_messages ADD UNIQUE KEY `consumer_unique_name` (`consumer`);
-        </item>
         <item for="uninstall">
-            DROP TABLE IF EXISTS ?:queue_messages
+            DROP TABLE IF EXISTS ?:jobs
         </item>
 
         <item for="install">
-            CREATE TABLE IF NOT EXISTS ?:queue_messages_undelivered (
-                id INT(11) NOT NULL,
-                queue_id varchar(64) NOT NULL,
-                body LONGBLOB NOT NULL,
-                output LONGBLOB NOT NULL,
-                timeout INT(11) DEFAULT NULL,
-                created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP),
+            CREATE TABLE IF NOT EXISTS ?:jobs_failed (
+                id BIGINT NOT NULL,
+                queue VARCHAR(255) NOT NULL,
+                connection VARCHAR(255) NOT NULL,
+                payload LONGTEXT NOT NULL,
+                exception LONGTEXT NOT NULL,
+                failed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP() NOT NULL,
                 PRIMARY KEY(id)
-            ) ENGINE=InnoDB;
+            ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
         </item>
         <item for="uninstall">
-            DROP TABLE IF EXISTS ?:queue_messages_undelivered
+            DROP TABLE IF EXISTS ?:jobs_failed
         </item>
     </queries>
 </addon>

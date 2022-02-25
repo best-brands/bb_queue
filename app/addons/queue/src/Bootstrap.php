@@ -26,10 +26,21 @@ class Bootstrap implements BootstrapInterface, HookHandlerProviderInterface
     public function getHookHandlerMap(): array
     {
         return [
-//            'save_log' => [
-//                'addons.queue.hook_handlers.log',
-//                'onSaveLog',
-//            ],
+            /**
+             * Custom save log hook handler in case you want to suppress root signing logs.
+             */
+            'save_log' => [
+                HookHandlers\LoggingHookHandler::class,
+                'onSaveLog',
+            ],
+
+            /**
+             * Core job exception handler entry.
+             */
+            'queue_job_exception_occurred' => [
+                HookHandlers\JobsHookHandler::class,
+                'onJobException'
+            ],
         ];
     }
 }

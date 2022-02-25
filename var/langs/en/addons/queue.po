@@ -1,0 +1,41 @@
+msgid ""
+msgstr "Project-Id-Version: tygh\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: English\n"
+"Language: en_US"
+
+msgctxt "Addons::name::queue"
+msgid "Queue"
+msgstr "Queue"
+
+msgctxt "Addons::description::queue"
+msgid "Provides an unified interface for asynchronous jobs."
+msgstr "Provides an unified interface for asynchronous jobs."
+
+msgctxt "Languages::queue.queue"
+msgid "Queue"
+msgstr "Queue"
+
+msgctxt "Languages::queue.connection"
+msgid "Connection"
+msgstr "Connection"
+
+msgctxt "Languages::queue.payload"
+msgid "Payload"
+msgstr "Payload"
+
+msgctxt "Languages::queue.failed_at"
+msgid "Failed at"
+msgstr "Failed at"
+
+msgctxt "Languages::queue.jobs_failed"
+msgid "Failed jobs"
+msgstr "Failed jobs"
+
+msgctxt "Languages::queue.jobs_failed_reschedule"
+msgid "Reschedule"
+msgstr "Reschedule"
+
+msgctxt "Languages::queue.reschedule_failed"
+msgid "Failed to reschedule job"
+msgstr "Failed to reschedule job"
