@@ -2,22 +2,27 @@
 
 namespace Tygh\Addons\QueueExample\Jobs;
 
-use Tygh\Addons\Queue\Job;
+use Tygh\Addons\Queue\InteractsWithQueue;
+use Tygh\Addons\Queue\Queueable;
+use Tygh\Addons\Queue\ShouldQueue;
 
 /**
  * Execute a job.
  */
-class ExampleJob extends Job
+class ExampleJob implements ShouldQueue
 {
-    /** @var string|null By setting the cron expression, it will get scheduled correctly */
-    protected ?string $cron_expression = '* * * * *';
+    use Queueable, InteractsWithQueue;
 
-    /**
-     * @param array  $job_info
-     * @param string $message
-     */
-    public function handle(array $job_info, $message): void
+    protected string $message;
+
+    public function __construct(
+        string $message
+    ) {
+        $this->message = $message;
+    }
+
+    public function handle(): void
     {
-        echo $message;
+        echo $this->message;
     }
 }

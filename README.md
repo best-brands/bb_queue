@@ -2,14 +2,77 @@
 
 An advanced add-on that allows you to write jobs that get processed by a worker-pool.
 
-## Creating a new job.
+## Requirements.
 
-See the add-on 'queue_example'.
+Mind that this requires CsCart 4.15 or higher. This has to do with a number of patches that have been put in place to
+allow better programming principles. Such as the addition of transactions to the `Tygh\Database\Connection` class, and
+a change to how hooks are prioritized (they now prioritize Pimple, not whether they are 'callable' or not). Furthermore,
+PHP 7.4 is required. This has to do with the simply better typing system available.
 
-## Scheduling jobs manually (see queue_example).
+## Creating a new job
+
+Jobs are serialized when they are put on a queue. In short if you plan to add any distinguishable properties to a job,
+they will be kept. However, mind that if you put very big properties in your constructor, that it might suffer because
+the job could end up being too large.
+
+The `handle` function does not auto-wire arguments from Pimple, as this is simply not possible for now. This is because
+Pimple does not support auto-wiring and additionally has now way of invoking methods on objects through the DI like
+Illuminate's `->call` function.
 
 ```php
-Tygh::$app['addons.queue_example.jobs.test']->schedule('whatever message contents you want, they get json encoded');
+namespace Tygh\Addons\QueueExample\Jobs;
+
+use Tygh\Addons\Queue\InteractsWithQueue;
+use Tygh\Addons\Queue\Queueable;
+use Tygh\Addons\Queue\ShouldQueue;
+
+class ExampleJob implements ShouldQueue
+{
+    use Queueable, InteractsWithQueue;
+
+    protected string $message;
+
+    public function __construct(string $message) {
+        $this->message = $message;
+    }
+
+    public function handle(): void {
+        echo $this->message;
+    }
+}
+
+```
+
+## Scheduling jobs through cron
+
+Use the latest V4 structure for CsCart add-ons and register use ServiceProviders. In this service provider you will be
+able to define the scheduler behavior by means of extending the Schedule dependency. In the queue_example add-on we do
+the following:
+
+```php
+namespace Tygh\Addons\QueueExample;
+
+use Pimple\Container;
+use Pimple\ServiceProviderInterface;
+use Tygh\Addons\Queue\Schedule;
+
+class ServiceProvider implements ServiceProviderInterface
+{
+    public function register(Container $pimple)
+    {
+        // We define the job dependency, note that we should use a factory to always instantiate new objects.
+        $pimple[Jobs\ExampleJob::class] = $pimple->factory(fn() => new Jobs\ExampleJob("default"));
+
+        $pimple->extend(Schedule::class, function (Schedule $schedule) {
+            // By passing a FQCN we retrieve it via our DI.
+            $schedule->job(Jobs\ExampleJob::class)->dailyAt('9:30');
+
+            // We can also do direct invocations through instantiating the object.
+            $schedule->job(new Jobs\ExampleJob("Direct invocation!"));
+        });
+    }
+}
+
 ```
 
 ## What to do with cli.php?
@@ -27,17 +90,15 @@ It is recommended to put cli.php outside the root folder, so you end up with a s
 
 If you do not, you **should change the contents to include init.php accordingly**.
 
-## How do I configure cron?
+## Configuring the Queue add-on
 
-Mind that php7.4 is required. Path to the binary differs per linux distro.
+Configure the crontab to schedule your periodic jobs accordingly:
 
 ```crontab
-* * * * * /usr/bin/php7.4 -f %%STORE_PATH%%/cli.php -- --dispatch=queue.schedule_cron_jobs
+* * * * * /usr/bin/php7.4 -f /var/www/cli.php -- --dispatch=queue.schedule_cron_jobs
 ```
 
-## How do I configure workers?
-
-You will need to run supervisor. We use a config that looks as follows.
+Configure supervisor with the amount of workers you will need.
 
 ```conf
 [supervisord]
@@ -47,7 +108,7 @@ pidfile = /run/supervisord.pid
 
 [program:cscart-worker]
 process_name=%(program_name)s_%(process_num)02d
-command=/usr/bin/php7.4 -f %%STORE_PATH%%/cli.php -- --dispatch=queue.launch_worker
+command=/usr/bin/php7.4 -f /var/www/cli.php -- --dispatch=queue.launch_worker
 autostart=true
 autorestart=true
 stopasgroup=true
@@ -55,11 +116,12 @@ killasgroup=true
 user=www-data
 numprocs=4
 redirect_stderr=true
-stdout_logfile=%%STORE_PATH%%/log/worker.log
+stdout_logfile=/var/www/log/worker.log
 stopwaitsecs=3600
 ```
 
-Replace %%STORE_PATH%% with your root folder.
+Of course these configuration options should be altered according to your needs, such as the location of the PHP binary,
+the amount of processes that you need to be 'working', logging output, etc.
 
 ## Suppressing the default CsCart logger
 
@@ -76,8 +138,12 @@ Make sure to replace the `fn_set_hook('save_log', ...);` with the following:
     }
 ```
 
-Finally, make sure to adjust `Bootstrap.php` to register the hook handler accordingly.
+## Dispatching jobs
 
-## Dispatching jobs programatically
+You can dispatch jobs using `fn_queue_dispatch`. To dispatch the aforementioned `ExampleJob` you could do the following:
 
-You can dispatch jobs using `fn_queue_dispatch` and `fn_queue_dispatch_sync`;
+```php
+namespace Tygh\Addons\QueueExample;
+
+fn_queue_dispatch(new Jobs\ExampleJob("Scheduling through fn_queue_dispatch!"));
+```

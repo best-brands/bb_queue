@@ -1,7 +1,8 @@
 <?php
 
-$schema['top']['administration']['items']['queue_messages'] = [
-    'href' => 'queue.manage',
+$schema['top']['administration']['items']['queue_failed_jobs'] = [
+    'href'     => 'queue.jobs_failed',
+    'title'    => __('queue.jobs_failed'),
     'position' => 810,
 ];
 
