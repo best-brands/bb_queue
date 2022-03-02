@@ -3,7 +3,7 @@
 namespace Tygh\Addons\Queue\Adapters;
 
 use DateTimeInterface;
-use Tygh\Addons\Queue\Exceptions\InvalidPayloadException;
+use Tygh\Addons\Queue\InvalidPayloadException;
 use Tygh\Addons\Queue\InteractsWithTime;
 use Tygh\Application;
 

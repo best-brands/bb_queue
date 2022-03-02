@@ -3,7 +3,7 @@
 namespace Tygh\Addons\Queue\Adapters;
 
 use Carbon\Carbon;
-use Tygh\Addons\Queue\Exceptions\InvalidPayloadException;
+use Tygh\Addons\Queue\InvalidPayloadException;
 use Tygh\Addons\Queue\Jobs\DatabaseJob;
 use Tygh\Addons\Queue\Jobs\Job;
 use Tygh\Addons\Queue\Jobs\JobRecord;

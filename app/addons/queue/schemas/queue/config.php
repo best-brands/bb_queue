@@ -49,7 +49,11 @@ $schema = [
         /**
          * To which queues to listen by default
          */
-        'queues' => 'high,default,low',
+        'queues' => [
+            'high',
+            'default',
+            'low',
+        ],
     ],
 
     /**
