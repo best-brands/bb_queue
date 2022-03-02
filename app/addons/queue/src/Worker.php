@@ -78,12 +78,12 @@ class Worker
      * Listen to the given queue in a loop.
      *
      * @param string        $connection_name
-     * @param string        $queue
+     * @param string        $queues
      * @param WorkerOptions $options
      *
      * @return int
      */
-    public function daemon(string $connection_name, string $queue, WorkerOptions $options): int
+    public function daemon(string $connection_name, array $queues, WorkerOptions $options): int
     {
         if ($supports_async_signals = $this->supportsAsyncSignals()) {
             $this->listenForSignals();
@@ -109,7 +109,7 @@ class Worker
             }
 
             $job = $this->getNextJob(
-                $this->manager->connection($connection_name), $queue
+                $this->manager->connection($connection_name), $queues
             );
 
             if ($supports_async_signals) {
@@ -149,21 +149,19 @@ class Worker
      * Get the next job from the queue connection.
      *
      * @param AdapterInterface $connection
-     * @param string           $queue
+     * @param array            $queues
      *
      * @return Jobs\JobInterface
      */
-    protected function getNextJob(AdapterInterface $connection, string $queue): ?Jobs\JobInterface
+    protected function getNextJob(AdapterInterface $connection, array $queues): ?Jobs\JobInterface
     {
-        $pop_job_callback = function ($queue) use ($connection) {
-            return $connection->pop($queue);
-        };
-
         try {
-            foreach (explode(',', $queue) as $queue) {
-                if (!is_null($job = $pop_job_callback($queue))) {
-                    return $job;
+            foreach ($queues as $queue) {
+                if (is_null($job = $connection->pop($queue))) {
+                    continue;
                 }
+
+                return $job;
             }
         } catch (Throwable $e) {
             $this->sleep(1);

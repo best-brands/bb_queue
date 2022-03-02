@@ -1,6 +1,6 @@
 <?php
 
-namespace Tygh\Addons\Queue\Exceptions;
+namespace Tygh\Addons\Queue;
 
 use Tygh\Exceptions\DeveloperException;
 
