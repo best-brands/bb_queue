@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <addon scheme="4.0">
-    <id>queue</id>
+    <id>bb_queue</id>
     <name>Queue</name>
     <description>Provides queueing and scheduling of jobs with workers</description>
     <version>1.0</version>
@@ -8,14 +8,13 @@
     <position>0</position>
     <status>active</status>
     <supplier>Best Brands</supplier>
-    <supplier_link>https://github.com/best-brands</supplier_link>
+    <supplier_link>https://bestbrands.eu</supplier_link>
     <default_language>en</default_language>
 
     <authors>
         <author>
             <name>Harm Smits</name>
-            <email>harm@bestbrands.eu</email>
-            <phone>+31625500655</phone>
+            <email>info@bestbrands.eu</email>
         </author>
     </authors>
 

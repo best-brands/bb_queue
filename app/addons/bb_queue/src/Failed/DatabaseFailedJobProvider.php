@@ -124,7 +124,11 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface, PrunableF
      */
     public function forget($id): bool
     {
-        return $this->database->query('DELETE FROM ?:jobs_failed WHERE id IN (?n)', $id) > 0;
+        if (!empty($id)) {
+            return $this->database->query('DELETE FROM ?:jobs_failed WHERE id IN (?n)', $id) > 0;
+        }
+
+        return true;
     }
 
     /**
