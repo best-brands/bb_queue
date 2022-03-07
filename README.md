@@ -9,6 +9,14 @@ allow better programming principles. Such as the addition of transactions to the
 a change to how hooks are prioritized (they now prioritize Pimple, not whether they are 'callable' or not). Furthermore,
 PHP 7.4 is required. This has to do with the simply better typing system available.
 
+## Useful add-ons
+
+### Email queue
+
+Allows sending emails in a delayed fashion. Emails will get put on the queue by default allowing them to be processed
+in the background. This results in much faster order updates, sending of newsletters and provides overall a better
+customer experience.
+
 ## Creating a new job
 
 Jobs are serialized when they are put on a queue. In short if you plan to add any distinguishable properties to a job,
