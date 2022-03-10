@@ -7,7 +7,7 @@ use Tygh\Core\BootstrapInterface;
 use Tygh\Core\HookHandlerProviderInterface;
 use Tygh\Registry;
 
-require_once Registry::get('config.dir.addons') . '/queue/func.php';
+require_once Registry::get('config.dir.addons') . '/bb_queue/func.php';
 
 /**
  * Class Bootstrap
